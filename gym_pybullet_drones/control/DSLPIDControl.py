@@ -39,8 +39,8 @@ class DSLPIDControl(BaseControl):
         self.Kp_pose = np.array([0.2, 0.2, 0.2])
         self.Kd_pose = np.array([0.1, 0.1, 0.1])
 
-        self.Kp_attitude = np.array([0.2, 0.2, 0.2])
-        self.Kd_attitude = np.array([0.1, 0.1, 0.1])
+        self.Kp_att = np.array([0.2, 0.2, 0.2])
+        self.Kd_att = np.array([0.1, 0.1, 0.1])
 
         # Your code ends here
 
@@ -269,7 +269,22 @@ class DSLPIDControl(BaseControl):
 
         #Write your code here
 
+        cur_orientation = np.array(p.getMatrixFromQuaternion(cur_quat)).reshape(3,3)
+        roll_d, pitch_d, yaw_d = target_euler
+        desired_orientation = Rotation.from_euler('zxy',[yaw_d, roll_d, pitch_d], degrees=False).as_matrix()
+
+        orientation_error = desired_orientation.T @ cur_orientation
+
+        error_rotation = 0.5 * np.array([
+            orientation_error[2,1] - orientation_error[1,2],
+            orientation_error[0,2] - orientation_error[2,0],
+            orientation_error[1,0] - orientation_error[0,1]
+        ])
+
+        ang_vel_error = target_rpy_rates - cur_ang_vel
+
         target_torques = np.zeros(3)
+        target_torques = -self.Kp_att*(error_rotation) + self.Kd_att*(ang_vel_error)
 
         #Your code ends here
 
