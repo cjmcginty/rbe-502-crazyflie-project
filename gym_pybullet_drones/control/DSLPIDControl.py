@@ -148,7 +148,7 @@ class DSLPIDControl(BaseControl):
         rpm = self._dslPIDAttitudeControl(control_timestep,
                                           thrust,
                                           cur_quat,
-                                          cur_ang_vel
+                                          cur_ang_vel,
                                           computed_target_rpy,
                                           target_rpy_rates
                                           )
