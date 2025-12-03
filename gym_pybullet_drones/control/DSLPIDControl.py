@@ -42,6 +42,20 @@ class DSLPIDControl(BaseControl):
         self.Kp_att = np.array([54000, 54000, 4000])
         self.Kd_att = np.array([5500, 5500, 1200])
 
+        # reduced derivative gains
+        #self.Kp_pose = np.array([0.47, 0.47, 0.72])
+        #self.Kd_pose = np.array([0.114, 0.114, 0.378])
+
+        #self.Kp_att = np.array([54000, 54000, 4000])
+        #self.Kd_att = np.array([3300, 3300, 720])
+
+        # reduced proportional gains
+        #self.Kp_pose = np.array([0.282, 0.282, 0.432])
+        #self.Kd_pose = np.array([0.19, 0.19, 0.63])
+
+        #self.Kp_att = np.array([32400, 32400, 2400])
+        #self.Kd_att = np.array([5500, 5500, 1200])
+
         # Your code ends here
 
         ######################################################
