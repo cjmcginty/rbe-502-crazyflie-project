@@ -116,8 +116,8 @@ def run(
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
 
-        des_st = circle.circle(elapsed)
-        # des_st = diamond.diamond(elapsed)
+        #des_st = circle.circle(elapsed)
+        des_st = diamond.diamond(elapsed)
         pos = des_st["pos"]
         vel = des_st["vel"]
         acc = des_st["acc"]

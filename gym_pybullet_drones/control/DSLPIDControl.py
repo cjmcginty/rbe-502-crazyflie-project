@@ -36,11 +36,11 @@ class DSLPIDControl(BaseControl):
 
         # You can initialize more parameters here
 
-        self.Kp_pose = np.array([0.2, 0.2, 0.2])
-        self.Kd_pose = np.array([0.1, 0.1, 0.1])
+        self.Kp_pose = np.array([0.47, 0.47, 0.72])
+        self.Kd_pose = np.array([0.19, 0.19, 0.63])
 
-        self.Kp_att = np.array([0.2, 0.2, 0.2])
-        self.Kd_att = np.array([0.1, 0.1, 0.1])
+        self.Kp_att = np.array([54000, 54000, 4000])
+        self.Kd_att = np.array([5500, 5500, 1200])
 
         # Your code ends here
 
@@ -211,6 +211,20 @@ class DSLPIDControl(BaseControl):
         target_thrust = np.zeros(3)
         target_thrust = self.Kp_pose*(position_error) + self.Kd_pose*(velocity_error) + mass*(desired_acceleration) + gravity_compensation
         
+
+        max_tilt_deg = 65.0
+        max_tilt = math.radians(max_tilt_deg)
+
+        thrust_xy = target_thrust[:2]
+        thrust_z = target_thrust[2]
+        norm_xy = np.linalg.norm(thrust_xy)
+
+        max_xy = abs(thrust_z) * math.tan(max_tilt)
+
+        if norm_xy > max_xy:
+            target_thrust[:2] = thrust_xy * (max_xy / (norm_xy + 1e-6))
+
+
         pos_e = np.zeros(3)
         pos_e = position_error
         
@@ -218,20 +232,13 @@ class DSLPIDControl(BaseControl):
         cur_rotation = np.array(p.getMatrixFromQuaternion(cur_quat)).reshape(3,3)
 
 
-        z_d_B = target_thrust / np.linalg.norm(target_thrust)
+        z_d_B = target_thrust / (np.linalg.norm(target_thrust) + 1e-6)
         x_d_C = np.array([np.cos(desired_yaw), np.sin(desired_yaw), 0])
-        y_d_B = np.cross(z_d_B, x_d_C) / np.linalg.norm(np.cross(z_d_B, x_d_C))
+        y_d_B = np.cross(z_d_B, x_d_C) / (np.linalg.norm(np.cross(z_d_B, x_d_C)) + 1e-6)
         x_d_B = np.cross(y_d_B, z_d_B)
 
         R_d_mat = np.column_stack((x_d_B, y_d_B, z_d_B))
-        R_d = Rotation.from_matrix(R_d_mat)
-
-        yaw_d, roll_d, pitch_d = R_d.as_euler('zxy', degrees=False)
-
-        target_rpy = np.zeros(3)
-        target_rpy = np.array([roll_d, pitch_d, yaw_d])
-
-        target_thrust = np.dot(target_thrust, cur_rotation[:, 2])
+        target_rpy = Rotation.from_matrix(R_d_mat).as_euler('zxy', degrees=False)
 
         #Your code ends here
 
@@ -270,8 +277,8 @@ class DSLPIDControl(BaseControl):
         #Write your code here
 
         cur_orientation = np.array(p.getMatrixFromQuaternion(cur_quat)).reshape(3,3)
-        roll_d, pitch_d, yaw_d = target_euler
-        desired_orientation = Rotation.from_euler('zxy',[yaw_d, roll_d, pitch_d], degrees=False).as_matrix()
+
+        desired_orientation = Rotation.from_euler('zxy', target_euler, degrees=False).as_matrix()
 
         orientation_error = desired_orientation.T @ cur_orientation
 
