@@ -38,7 +38,7 @@ def build_AB(m, Ixx, Iyy, Izz, g=9.81):
     return A, B
 
 def design_lqr(A, B):
-    Q = np.diag([2.0,  20.0,  4.0,
+    Q = np.diag([2.0,  2.0,  4.0,
                  5.0,  5.0,  1.0,
                  1.0,  1.0,  2.0,
                  2.0,  2.0,  1.0])
@@ -75,7 +75,7 @@ def diamond_traj(T, dt):
     return t, np.vstack(rd), np.vstack(vd)
     
 
-def simulate_lqr(A, B, K, traj_func, T=8.0, dt=0.004):
+def simulate_lqr(A, B, K, traj_func, T=10.0, dt=0.004):
     t, rd, vd = traj_func(T, dt)
     N = len(t)
 

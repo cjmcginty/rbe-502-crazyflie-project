@@ -34,6 +34,8 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 
 from gym_pybullet_drones.trajectory import circle, diamond
 
+from gym_pybullet_drones.control.LQRControl import LQRControl
+
 DEFAULT_DRONES = DroneModel("cf2x")
 DEFAULT_NUM_DRONES = 1
 DEFAULT_PHYSICS = Physics("pyb")
@@ -106,6 +108,7 @@ def run(
     #### Initialize the controllers ############################
     if drone in [DroneModel.CF2X, DroneModel.CF2P]:
         ctrl = [DSLPIDControl(drone_model=drone) for i in range(num_drones)]
+        #ctrl = [LQRControl(drone_model=drone) for i in range(num_drones)]
 
     #### Run the simulation ####################################
     action = np.zeros((num_drones,4))
